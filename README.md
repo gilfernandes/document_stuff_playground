@@ -27,6 +27,12 @@ pip install tiktoken
 mamba install docx2txt
 ```
 
+Then create a .env file in the root folder of the application with your Open API key:
+
+```
+OPENAI_API_KEY=<key>
+```
+
 ## Executing the application
 
 Add some CV's to the docs folder as either pdf or docx file and run this script in the root folder:
