@@ -10,6 +10,10 @@ The documents we used for testing were CVs against which we asked the following 
 "Please extract all hyperlinks.",
 "How many years of experience does this candidate have as a mobile developer?"
 
+## Installation
+
+Please run this script to install this application in a virtual environment.
+
 ```bash
 conda create --name langchain_fastapi python=3.10
 conda activate langchain_fastapi
@@ -22,3 +26,16 @@ pip install chromadb
 pip install tiktoken
 mamba install docx2txt
 ```
+
+## Executing the application
+
+Add some CV's to the docs folder as either pdf or docx file and run this script in the root folder:
+
+```bash
+python .\document_web.py
+```
+
+Then open this URL:
+
+http://localhost:8000/candidates.html
+
