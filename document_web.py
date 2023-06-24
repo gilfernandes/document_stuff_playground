@@ -1,4 +1,3 @@
-import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -11,6 +10,7 @@ import logging
 import time
 
 from pathlib import Path
+from datetime import datetime
 
 def setup_fastapi():
     app = FastAPI()
@@ -29,13 +29,15 @@ class CandidateCache():
 
 candidate_cache = CandidateCache()
 
+SLEEP_TIME = 60 * 10
+
 class BackgroundTasks(threading.Thread):
 
     """
-    Query Chat GPT in the background.
+    Processes documents and query Chat GPT in the background.
     """
 
-    def __init__(self, candidate_cache: CandidateCache, sleep_time = 60 * 5):
+    def __init__(self, candidate_cache: CandidateCache, sleep_time = SLEEP_TIME):
         super().__init__()
         self.candidate_cache, self.sleep_time = candidate_cache, sleep_time
         self.data_cache = sleep_time
@@ -60,6 +62,23 @@ async def hello():
 
 @app.get("/candidates.html", response_class=HTMLResponse)
 async def hello_html():
+
+    def generate_timestamp():
+        # Get the current date and time
+        now = datetime.now()
+
+        # Get the weekday, day, month, year, and time in English
+        weekday = now.strftime("%A")
+        day = now.strftime("%d")
+        month = now.strftime("%B")
+        year = now.strftime("%Y")
+        time = now.strftime("%H:%M:%S")
+
+        # Create the timestamp string
+        timestamp = f"{weekday}, {day} {month} {year} {time}"
+
+        return timestamp
+
     return f"""
 <html>
     <head>
@@ -75,11 +94,21 @@ async def hello_html():
     <body>
         <div class="container">
             <h1>Candidate Information</h1>
+            <h4>{generate_timestamp()}</h4>
+            <div class="row">
+                <div class="col-12 mb-3" style="text-align: right">
+                    <button type="button" class="btn btn-light">Toggle Cards</button>
+                </div>
+            </div>
             {candidate_cache.candidate_info_html}
         </div>
         <script>
             [...document.querySelectorAll(".card-header")]
                 .forEach(e => e.addEventListener("click", () => e.parentNode.querySelector(".card-body").classList.toggle('d-none')))
+            function toggleCards() {{
+                [...document.querySelectorAll(".card-body")].forEach(e => e.classList.toggle('d-none'))
+            }}
+            document.querySelector("button").addEventListener("click", toggleCards)
         </script>
     </body>
 </html>
